@@ -1,0 +1,197 @@
+{
+  "total_transactions": 10000,
+  "return_rate": 11.04,
+  "precision": 0.4,
+  "recall": 0.3891,
+  "f1_score": 0.3945,
+  "auc_roc": 0.7874,
+  "confusion_matrix": {
+    "true_negatives": 1650,
+    "false_positives": 129,
+    "false_negatives": 135,
+    "true_positives": 86
+  },
+  "false_positive_cost": 478832.9,
+  "false_negative_cost": 501104.19,
+  "avg_transaction_amount": 3711.88,
+  "total_test_samples": 2000,
+  "total_returned_in_test": 221,
+  "threshold_curve": [
+    {
+      "threshold": 0.1,
+      "precision": 0.1355,
+      "recall": 0.9548,
+      "true_negatives": 433,
+      "false_positives": 1346,
+      "false_negatives": 10,
+      "true_positives": 211,
+      "fp_cost": 4996194.42,
+      "fn_cost": 37118.83
+    },
+    {
+      "threshold": 0.2,
+      "precision": 0.1874,
+      "recall": 0.8597,
+      "true_negatives": 955,
+      "false_positives": 824,
+      "false_negatives": 31,
+      "true_positives": 190,
+      "fp_cost": 3058591.53,
+      "fn_cost": 115068.37
+    },
+    {
+      "threshold": 0.3,
+      "precision": 0.2675,
+      "recall": 0.7104,
+      "true_negatives": 1349,
+      "false_positives": 430,
+      "false_negatives": 64,
+      "true_positives": 157,
+      "fp_cost": 1596109.66,
+      "fn_cost": 237560.51
+    },
+    {
+      "threshold": 0.4,
+      "precision": 0.3297,
+      "recall": 0.543,
+      "true_negatives": 1535,
+      "false_positives": 244,
+      "false_negatives": 101,
+      "true_positives": 120,
+      "fp_cost": 905699.43,
+      "fn_cost": 374900.18
+    },
+    {
+      "threshold": 0.5,
+      "precision": 0.4,
+      "recall": 0.3891,
+      "true_negatives": 1650,
+      "false_positives": 129,
+      "false_negatives": 135,
+      "true_positives": 86,
+      "fp_cost": 478832.9,
+      "fn_cost": 501104.19
+    },
+    {
+      "threshold": 0.6,
+      "precision": 0.395,
+      "recall": 0.2127,
+      "true_negatives": 1707,
+      "false_positives": 72,
+      "false_negatives": 174,
+      "true_positives": 47,
+      "fp_cost": 267255.57,
+      "fn_cost": 645867.63
+    },
+    {
+      "threshold": 0.7,
+      "precision": 0.3243,
+      "recall": 0.0543,
+      "true_negatives": 1754,
+      "false_positives": 25,
+      "false_negatives": 209,
+      "true_positives": 12,
+      "fp_cost": 92797.07,
+      "fn_cost": 775783.53
+    },
+    {
+      "threshold": 0.8,
+      "precision": 0.375,
+      "recall": 0.0136,
+      "true_negatives": 1774,
+      "false_positives": 5,
+      "false_negatives": 218,
+      "true_positives": 3,
+      "fp_cost": 18559.41,
+      "fn_cost": 809190.48
+    },
+    {
+      "threshold": 0.9,
+      "precision": 0.0,
+      "recall": 0.0,
+      "true_negatives": 1779,
+      "false_positives": 0,
+      "false_negatives": 221,
+      "true_positives": 0,
+      "fp_cost": 0.0,
+      "fn_cost": 820326.13
+    }
+  ],
+  "feature_importance": [
+    {
+      "feature": "customer_age_days",
+      "importance": 0.1888
+    },
+    {
+      "feature": "amount",
+      "importance": 0.1821
+    },
+    {
+      "feature": "order_velocity",
+      "importance": 0.1115
+    },
+    {
+      "feature": "payment_method",
+      "importance": 0.0841
+    },
+    {
+      "feature": "hour",
+      "importance": 0.0783
+    },
+    {
+      "feature": "address_match",
+      "importance": 0.0767
+    },
+    {
+      "feature": "state",
+      "importance": 0.075
+    },
+    {
+      "feature": "customer_tier",
+      "importance": 0.0532
+    },
+    {
+      "feature": "pincode_tier",
+      "importance": 0.0509
+    },
+    {
+      "feature": "category",
+      "importance": 0.0489
+    },
+    {
+      "feature": "previous_returns",
+      "importance": 0.026
+    },
+    {
+      "feature": "device",
+      "importance": 0.0246
+    }
+  ],
+  "classification_report": {
+    "0": {
+      "precision": 0.9243697478991597,
+      "recall": 0.927487352445194,
+      "f1-score": 0.9259259259259259,
+      "support": 1779.0
+    },
+    "1": {
+      "precision": 0.4,
+      "recall": 0.3891402714932127,
+      "f1-score": 0.3944954128440367,
+      "support": 221.0
+    },
+    "accuracy": 0.868,
+    "macro avg": {
+      "precision": 0.6621848739495799,
+      "recall": 0.6583138119692034,
+      "f1-score": 0.6602106693849813,
+      "support": 2000.0
+    },
+    "weighted avg": {
+      "precision": 0.8664268907563025,
+      "recall": 0.868,
+      "f1-score": 0.8672028542303771,
+      "support": 2000.0
+    }
+  }
+}

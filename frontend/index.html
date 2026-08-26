@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReturnGuard — AI Return-Risk Scoring & Prevention | Razorpay Buildathon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+    <!-- Official Razorpay Checkout Library -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <div class="logo-mark">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-name">ReturnGuard</span>
+                    <span class="logo-sub">Razorpay AI Risk Manager</span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <a href="#metrics" class="nav-link">Model</a>
+                <a href="#tuner" class="nav-link">Threshold</a>
+                <a href="#scorer" class="nav-link">Score Engine</a>
+                <a href="#webhook" class="nav-link">Webhooks</a>
+                <a href="#checkout" class="nav-link">Checkout UI</a>
+                <a href="#batch" class="nav-link">Batch 10k</a>
+                <a href="#audit" class="nav-link">Audit Trail</a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="moon-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-inner">
+            <h1 class="hero-title">
+                Eliminate RTO & Return Fraud<br>
+                <span class="gradient-text">before warehouse dispatch</span>
+            </h1>
+            <p class="hero-desc">
+                Real-time ML risk engine powered by Random Forest & SHAP explainability, 
+                Razorpay Checkout dynamic interventions, automated WhatsApp customer verification, 
+                and live webhook integration.
+            </p>
+            <div class="hero-actions">
+                <a href="#scorer" class="btn-hero btn-fill">
+                    Try Live Risk Scorer
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+                <a href="#webhook" class="btn-hero btn-outline">Live Webhook Specs</a>
+                <a href="#checkout" class="btn-hero btn-ghost">Razorpay Checkout Demo</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MODEL PERFORMANCE -->
+    <section class="section" id="metrics">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Model Performance & Economics</h2>
+                <p class="section-sub">Trained on 10,000 synthetic transactions — Evaluated on 20% held-out test split</p>
+            </div>
+            <div class="model-chip">
+                <span class="chip-dot"></span>
+                <span id="data-count">Model Ready (10,000 txns)</span>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="m-card">
+                <div class="m-top">
+                    <span class="m-label">Precision</span>
+                    <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                </div>
+                <span class="m-value" id="precision">0%</span>
+                <div class="m-bar"><div class="m-fill" id="precision-bar"></div></div>
+                <span class="m-hint">Of flagged orders, % that actually returned</span>
+            </div>
+            <div class="m-card">
+                <div class="m-top">
+                    <span class="m-label">Recall</span>
+                    <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.35-4.35"/><circle cx="11" cy="11" r="8"/></svg>
+                </div>
+                <span class="m-value" id="recall">0%</span>
+                <div class="m-bar"><div class="m-fill" id="recall-bar"></div></div>
+                <span class="m-hint">Of all actual returns, % caught by engine</span>
+            </div>
+            <div class="m-card">
+                <div class="m-top">
+                    <span class="m-label">F1 Score</span>
+                    <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </div>
+                <span class="m-value" id="f1">0%</span>
+                <div class="m-bar"><div class="m-fill" id="f1-bar"></div></div>
+                <span class="m-hint">Harmonic mean balancing precision & recall</span>
+            </div>
+            <div class="m-card">
+                <div class="m-top">
+                    <span class="m-label">AUC-ROC</span>
+                    <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 4 4 5-6"/></svg>
+                </div>
+                <span class="m-value" id="auc">0.000</span>
+                <div class="m-bar"><div class="m-fill" id="auc-bar"></div></div>
+                <span class="m-hint">Class separation capability</span>
+            </div>
+        </div>
+
+        <div class="cost-row">
+            <div class="cost-card fp-card">
+                <div class="cost-info">
+                    <span class="cost-title">False Positive Cost (Blocked Revenue)</span>
+                    <span class="cost-desc">Good customers unnecessarily frictioned</span>
+                </div>
+                <span class="cost-amount" id="fp-cost">₹0</span>
+            </div>
+            <div class="cost-card fn-card">
+                <div class="cost-info">
+                    <span class="cost-title">False Negative Cost (Missed RTO Loss)</span>
+                    <span class="cost-desc">Return logistics & transit damage losses</span>
+                </div>
+                <span class="cost-amount" id="fn-cost">₹0</span>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3 class="chart-title">Confusion Matrix</h3>
+                <div class="cm-cells">
+                    <div class="cm-cell tn"><span class="cm-num" id="tn">0</span><span class="cm-tag">True Neg (Safe)</span></div>
+                    <div class="cm-cell fp"><span class="cm-num" id="fp">0</span><span class="cm-tag">False Pos (False Alarm)</span></div>
+                    <div class="cm-cell fn"><span class="cm-num" id="fn">0</span><span class="cm-tag">False Neg (Missed Risk)</span></div>
+                    <div class="cm-cell tp"><span class="cm-num" id="tp">0</span><span class="cm-tag">True Pos (RTO Saved)</span></div>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-title">Feature Importance (SHAP Global Attribution)</h3>
+                <div class="feat-list" id="feature-bars"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- THRESHOLD TUNER + POLICY SIMULATOR -->
+    <section class="section tuner-sec" id="tuner">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Threshold Tuner & Merchant ROI Simulator</h2>
+                <p class="section-sub">Adjust policy cutoff — watch precision, recall and net profitability trade off</p>
+            </div>
+        </div>
+        <div class="tuner-grid">
+            <div class="chart-card tuner-chart-card">
+                <h3 class="chart-title">Precision vs Recall vs Cost Curve</h3>
+                <svg class="curve-chart" id="curve-chart" viewBox="0 0 520 280" preserveAspectRatio="xMidYMid meet"></svg>
+                <div class="curve-legend">
+                    <span class="legend-item"><span class="legend-dot" style="background:#6366f1"></span>Precision</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#34d399"></span>Recall</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>FP Cost</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#fb7185"></span>FN Cost</span>
+                </div>
+            </div>
+            <div class="tuner-controls">
+                <div class="slider-card">
+                    <div class="slider-head">
+                        <span class="slider-label">Policy Risk Cutoff</span>
+                        <span class="slider-value" id="threshold-value">0.50</span>
+                    </div>
+                    <input type="range" id="threshold-slider" min="0.1" max="0.9" step="0.1" value="0.5" class="threshold-slider">
+                    <div class="slider-marks">
+                        <span>0.1<br><em>Strict (Zero RTO)</em></span>
+                        <span>0.5<br><em>Balanced</em></span>
+                        <span>0.9<br><em>Lenient (Growth)</em></span>
+                    </div>
+                </div>
+                <div class="tuner-stats">
+                    <div class="t-stat"><span class="t-label">Precision</span><span class="t-val indigo" id="t-precision">--</span></div>
+                    <div class="t-stat"><span class="t-label">Recall</span><span class="t-val green" id="t-recall">--</span></div>
+                    <div class="t-stat"><span class="t-label">FP Cost</span><span class="t-val amber" id="t-fp-cost">--</span></div>
+                    <div class="t-stat"><span class="t-label">FN Cost</span><span class="t-val red" id="t-fn-cost">--</span></div>
+                </div>
+                <div class="policy-card">
+                    <h3 class="chart-title">Monthly Merchant ROI Calculator</h3>
+                    <div class="policy-inputs">
+                        <div class="p-input"><label>Monthly Orders</label><input type="number" id="sim-orders" value="10000" min="100"></div>
+                        <div class="p-input"><label>Avg Order Value (₹)</label><input type="number" id="sim-aov" value="5000" min="100"></div>
+                    </div>
+                    <div class="policy-result">
+                        <div class="p-row"><span>RTO Losses Prevented</span><span class="p-pos" id="sim-saved">--</span></div>
+                        <div class="p-row"><span>Good Orders Blocked</span><span class="p-neg" id="sim-lost">--</span></div>
+                        <div class="p-row net"><span>Net Monthly Savings</span><span class="p-net" id="sim-net">--</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCORER -->
+    <section class="section scorer-sec" id="scorer">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Live Transaction Scorer & AI Copilot</h2>
+                <p class="section-sub">Test single orders with local SHAP feature attribution & automated customer outreach</p>
+            </div>
+        </div>
+
+        <!-- 1-CLICK QUICK PRESETS -->
+        <div class="presets-container">
+            <span class="presets-label">⚡ 1-Click Test Scenarios:</span>
+            <div class="presets-chips">
+                <button type="button" class="preset-chip" id="preset-cod-electronics">
+                    🚨 High-Risk COD Electronics
+                </button>
+                <button type="button" class="preset-chip" id="preset-midnight-spree">
+                    🌙 Midnight Velocity Spree
+                </button>
+                <button type="button" class="preset-chip" id="preset-loyal-metro">
+                    💎 Loyal Metro UPI (Safe)
+                </button>
+                <button type="button" class="preset-chip" id="preset-tier3-mismatch">
+                    📍 Tier-3 Address Mismatch
+                </button>
+            </div>
+        </div>
+
+        <div class="scorer-grid">
+            <div class="form-panel">
+                <form id="score-form">
+                    <div class="input-row">
+                        <div class="input-group"><label>Order Amount (₹)</label><input type="number" id="amount" value="8500" min="1"></div>
+                        <div class="input-group"><label>Category</label>
+                            <select id="category"><option>Electronics</option><option>Clothing</option><option>Home & Kitchen</option><option>Beauty</option><option>Sports</option><option>Books</option><option>Toys</option></select>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group"><label>Payment Method</label>
+                            <select id="payment_method"><option>UPI</option><option>Credit Card</option><option>Debit Card</option><option>Net Banking</option><option>COD</option><option>Wallet</option></select>
+                        </div>
+                        <div class="input-group"><label>Device Type</label>
+                            <select id="device"><option>Mobile</option><option>Desktop</option><option>Tablet</option></select>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group"><label>Billing/Shipping Match</label>
+                            <select id="address_match"><option>Same as billing</option><option>Different from billing</option></select>
+                        </div>
+                        <div class="input-group"><label>Customer Tier</label>
+                            <select id="customer_tier"><option>New</option><option>Returning</option><option>Loyal</option></select>
+                        </div>
+                    </div>
+                    <div class="input-row three">
+                        <div class="input-group"><label>Account Age (days)</label><input type="number" id="customer_age_days" value="45" min="0"></div>
+                        <div class="input-group"><label>Orders (Last 7d)</label><input type="number" id="order_velocity" value="2" min="1"></div>
+                        <div class="input-group"><label>Past Returns</label><input type="number" id="previous_returns" value="0" min="0"></div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group"><label>Order Timestamp</label><input type="datetime-local" id="order_time"></div>
+                        <div class="input-group"><label>Delivery Pincode</label>
+                            <input type="text" id="pincode" maxlength="6" inputmode="numeric" placeholder="e.g. 560001" autocomplete="off">
+                            <div class="pin-meta" id="pin-meta"></div>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group"><label>State</label><input type="text" id="pin_state" readonly placeholder="Auto-detected from Pincode"></div>
+                        <div class="input-group"><label>District / Tier</label><input type="text" id="pin_district" readonly placeholder="Auto-detected from Pincode"></div>
+                    </div>
+                    <button type="submit" class="btn-analyze" id="analyze-btn">
+                        <span class="btn-analyze-text">⚡ Run Real-Time Risk Analysis</span>
+                        <span class="btn-analyze-loader"></span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="result-panel" id="result-panel">
+                <div class="result-idle" id="result-idle">
+                    <div class="idle-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <p class="idle-text">Select a preset or enter details<br>to generate instant risk scoring.</p>
+                </div>
+
+                <div class="result-live hidden" id="result-live">
+                    <div class="gauge-wrap">
+                        <svg class="gauge" viewBox="0 0 200 120">
+                            <path class="gauge-track" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke-width="12" stroke-linecap="round"/>
+                            <path class="gauge-fill" id="gauge-arc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke-width="12" stroke-linecap="round"/>
+                        </svg>
+                        <div class="gauge-center">
+                            <span class="gauge-score" id="result-score">0</span>
+                            <span class="gauge-label">/ 100 Risk</span>
+                        </div>
+                    </div>
+
+                    <div class="result-tags">
+                        <span class="tag" id="result-level">--</span>
+                        <span class="tag action-tag" id="result-action">--</span>
+                    </div>
+
+                    <div class="conf-bar">
+                        <span class="conf-label">Model Confidence</span>
+                        <div class="conf-track"><div class="conf-fill" id="conf-fill"></div></div>
+                        <span class="conf-value" id="result-confidence">0%</span>
+                    </div>
+
+                    <!-- AI COPILOT & WHATSAPP OUTREACH -->
+                    <div class="copilot-card" id="copilot-card">
+                        <div class="copilot-header">
+                            <div class="copilot-title-row">
+                                <span class="copilot-badge">AI COPILOT</span>
+                                <h4 class="copilot-title">Autonomous Risk Assessment</h4>
+                            </div>
+                            <span class="copilot-roi" id="copilot-roi">₹0 Saved</span>
+                        </div>
+                        <p class="copilot-note" id="copilot-note"></p>
+                        
+                        <div class="wa-container">
+                            <div class="wa-header">
+                                <span>💬 1-Click WhatsApp Customer Outreach</span>
+                                <button type="button" class="btn-copy-wa" id="btn-copy-wa">Copy Message</button>
+                            </div>
+                            <div class="wa-bubble" id="wa-bubble"></div>
+                        </div>
+                    </div>
+
+                    <!-- SHAP EXPLANATIONS -->
+                    <div class="shap-block">
+                        <h4 class="reasons-title">SHAP Feature Attribution (Why this scored)</h4>
+                        <div class="shap-bars" id="shap-bars"></div>
+                    </div>
+
+                    <!-- MERCHANT RECOMMENDATIONS -->
+                    <div class="recs-block">
+                        <h4 class="reasons-title">Automated Merchant Interventions</h4>
+                        <div class="recs-list" id="recs-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE & SIMULATED WEBHOOKS -->
+    <section class="section" id="webhook">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Razorpay Webhook Integration</h2>
+                <p class="section-sub">Production-ready webhook listener with HMAC-SHA256 signature verification</p>
+            </div>
+            <div class="wh-action-btns">
+                <button class="btn-hero btn-fill" id="simulate-webhook">
+                    Fire Simulated Webhook
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="webhook-endpoint-card">
+            <div class="endpoint-header">
+                <span class="method-tag">POST</span>
+                <code class="endpoint-url" id="live-webhook-url">https://&lt;your-domain&gt;/api/webhook/razorpay</code>
+                <button class="btn-copy-url" id="copy-endpoint-btn">Copy URL</button>
+            </div>
+            <p class="endpoint-desc">
+                Register this endpoint in your <strong>Razorpay Dashboard &gt; Settings &gt; Webhooks</strong> for events <code>payment.authorized</code>, <code>order.paid</code>. Returns risk notes injected into the payment object.
+            </p>
+        </div>
+
+        <div class="webhook-result hidden" id="webhook-result">
+
+            <!-- Step Flow: What Just Happened -->
+            <div class="wh-story-flow">
+                <div class="wh-story-step" id="wh-step-1">
+                    <div class="wh-story-icon">💳</div>
+                    <div class="wh-story-label">Payment Received</div>
+                    <div class="wh-story-sub" id="wh-s1-detail">Razorpay sent a payment event</div>
+                </div>
+                <div class="wh-story-arrow">→</div>
+                <div class="wh-story-step" id="wh-step-2">
+                    <div class="wh-story-icon">🤖</div>
+                    <div class="wh-story-label">AI Risk Check</div>
+                    <div class="wh-story-sub" id="wh-s2-detail">ReturnGuard scored the transaction</div>
+                </div>
+                <div class="wh-story-arrow">→</div>
+                <div class="wh-story-step" id="wh-step-3">
+                    <div class="wh-story-icon" id="wh-s3-icon">✅</div>
+                    <div class="wh-story-label">Merchant Action</div>
+                    <div class="wh-story-sub" id="wh-s3-detail">Instruction sent to warehouse</div>
+                </div>
+            </div>
+
+            <!-- Payment Info Cards -->
+            <div class="wh-info-cards">
+                <div class="wh-info-card">
+                    <div class="wh-info-icon">💰</div>
+                    <div class="wh-info-content">
+                        <div class="wh-info-label">Payment Amount</div>
+                        <div class="wh-info-value" id="wh-card-amount">₹0</div>
+                    </div>
+                </div>
+                <div class="wh-info-card">
+                    <div class="wh-info-icon">📱</div>
+                    <div class="wh-info-content">
+                        <div class="wh-info-label">Payment Method</div>
+                        <div class="wh-info-value" id="wh-card-method">UPI</div>
+                    </div>
+                </div>
+                <div class="wh-info-card">
+                    <div class="wh-info-icon">🔖</div>
+                    <div class="wh-info-content">
+                        <div class="wh-info-label">Transaction ID</div>
+                        <div class="wh-info-value" id="wh-card-txn">WH-XXXXX</div>
+                    </div>
+                </div>
+                <div class="wh-info-card">
+                    <div class="wh-info-icon">📡</div>
+                    <div class="wh-info-content">
+                        <div class="wh-info-label">Webhook Event</div>
+                        <div class="wh-info-value" id="wh-card-event">payment.authorized</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Result + Action -->
+            <div class="wh-risk-row">
+                <div class="wh-risk-block" id="wh-risk-block">
+                    <div class="wh-risk-score-circle" id="wh-risk-circle">
+                        <span id="wh-risk-score-val">0</span>
+                        <small>RISK</small>
+                    </div>
+                    <div class="wh-risk-details">
+                        <div class="wh-risk-level" id="wh-risk-level-label">LOW RISK</div>
+                        <div class="wh-risk-action-tag" id="wh-risk-action-tag">→ Action: PASS</div>
+                    </div>
+                </div>
+                <div class="wh-injected-notes" id="wh-injected-notes">
+                    <div class="wh-notes-title">📝 Notes Injected into Razorpay Payment Object</div>
+                    <div class="wh-notes-grid" id="wh-notes-grid"></div>
+                </div>
+            </div>
+
+            <!-- Merchant Interventions -->
+            <div id="wh-assessment"></div>
+        </div>
+    </section>
+
+
+    <!-- CHECKOUT SIMULATOR -->
+    <section class="section" id="checkout">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Adaptive Razorpay Checkout</h2>
+                <p class="section-sub">Experience how risk rules dynamically disable COD or incentivize UPI prepaid conversion</p>
+            </div>
+        </div>
+        <div class="checkout-grid">
+            <div class="checkout-config">
+                <h3 class="chart-title">Configure Order Parameters</h3>
+                <div class="ck-inputs">
+                    <div class="p-input"><label>Cart Amount (₹)</label><input type="number" id="ck-amount" value="12000" min="1"></div>
+                    <div class="p-input"><label>Payment Method Intent</label>
+                        <select id="ck-payment"><option>COD</option><option>UPI</option><option>Credit Card</option><option>Debit Card</option></select>
+                    </div>
+                    <div class="p-input"><label>Customer Tier</label>
+                        <select id="ck-tier"><option>New</option><option>Returning</option><option>Loyal</option></select>
+                    </div>
+                    <div class="p-input"><label>Address Match</label>
+                        <select id="ck-address"><option>Different from billing</option><option>Same as billing</option></select>
+                    </div>
+                    <div class="p-input"><label>Delivery Pincode</label>
+                        <input type="text" id="ck-pincode" maxlength="6" inputmode="numeric" placeholder="e.g. 560001" autocomplete="off">
+                    </div>
+                    <div class="p-input"><label>State</label><input type="text" id="ck-state" readonly placeholder="Auto-detected"></div>
+                    <div class="p-input"><label>District</label><input type="text" id="ck-district" readonly placeholder="Auto-detected"></div>
+                </div>
+                <div class="ck-pin-meta" id="ck-pin-meta"></div>
+
+                
+                <div class="ck-btn-group">
+                    <button class="btn-analyze" id="run-checkout">Simulate Mobile Checkout</button>
+                    <button class="btn-hero btn-outline full-width" id="launch-real-rzp">⚡ Open Real Razorpay Modal</button>
+                </div>
+            </div>
+            
+            <div class="checkout-preview hidden" id="checkout-preview">
+                <div class="ck-phone">
+                    <div class="ck-status-bar">
+                        <span>9:41</span>
+                        <span class="ck-notch"></span>
+                        <span>100%</span>
+                    </div>
+                    <div class="ck-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                        <span>Razorpay Magic Checkout</span>
+                    </div>
+                    <div class="ck-amount-display" id="ck-amount-display">₹12,000</div>
+                    <div class="ck-risk-badge" id="ck-risk-badge">LOW RISK</div>
+                    <div class="ck-message" id="ck-message"></div>
+                    <div class="ck-methods" id="ck-methods"></div>
+                    <div class="ck-discount" id="ck-discount"></div>
+                    <button class="ck-pay-btn" id="ck-pay-btn">Proceed to Pay</button>
+                    <div class="ck-pay-overlay hidden" id="ck-pay-overlay">
+                        <div class="ck-pay-spinner"></div>
+                        <p class="ck-pay-status" id="ck-pay-status">Processing...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BATCH SCORING -->
+    <section class="section" id="batch">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Batch Analytics (10,000 Orders)</h2>
+                <p class="section-sub">Process large merchant order books on demand</p>
+            </div>
+            <button class="btn-hero btn-fill" id="run-batch-btn">
+                Run Batch Analysis
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </button>
+        </div>
+        <div class="batch-results hidden" id="batch-results">
+            <div class="batch-stats">
+                <div class="b-stat"><span class="b-num" id="b-total">0</span><span class="b-label">Total Scored</span></div>
+                <div class="b-stat"><span class="b-num" id="b-flagged">0</span><span class="b-label">Flagged (Risk)</span></div>
+                <div class="b-stat"><span class="b-num" id="b-passed">0</span><span class="b-label">Auto-Approved</span></div>
+                <div class="b-stat warn"><span class="b-num" id="b-blocked">₹0</span><span class="b-label">Blocked Risk Value</span></div>
+                <div class="b-stat amber-stat"><span class="b-num" id="b-review">₹0</span><span class="b-label">Review Value</span></div>
+            </div>
+            <div class="batch-table-head">
+                <h3 class="chart-title">Highest Risk Orders Flagged</h3>
+                <button class="btn-download" id="download-csv">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                    Download Scored Batch CSV
+                </button>
+            </div>
+            <div class="table-wrap">
+                <table class="batch-table">
+                    <thead><tr><th>TXN ID</th><th>Amount</th><th>Risk Score</th><th>Level</th><th>Action</th><th>Top SHAP Factor</th></tr></thead>
+                    <tbody id="batch-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- PERSISTENT AUDIT LOG -->
+    <section class="section" id="audit">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Decision Audit Trail</h2>
+                <p class="section-sub">Persistent ledger of all scoring events, webhooks, and merchant interventions</p>
+            </div>
+            <div class="audit-actions">
+                <a href="/api/audit-log/export?format=csv" class="btn-download" target="_blank">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                    Export CSV
+                </a>
+                <a href="/api/audit-log/export?format=json" class="btn-download" target="_blank">
+                    Export JSON
+                </a>
+                <button class="btn-clear-audit" id="clear-audit-btn">Clear Log</button>
+            </div>
+        </div>
+        <div class="audit-list" id="audit-list">
+            <div class="audit-empty">No decisions logged yet. Test a scenario or score a transaction above.</div>
+        </div>
+    </section>
+
+    <!-- ARCHITECTURE PIPELINE -->
+    <section class="section" id="how">
+        <div class="section-head">
+            <div><h2 class="section-title">System Architecture</h2><p class="section-sub">Production-grade risk evaluation & intervention pipeline</p></div>
+        </div>
+        <div class="steps-row">
+            <div class="step-card"><div class="step-num">01</div><h4>Data Pipeline</h4><p>10,000 synthetic Indian e-commerce transactions modeled on COD RTO spikes, postal pincode tiers, and velocity bursts.</p></div>
+            <div class="step-arrow">→</div>
+            <div class="step-card"><div class="step-num">02</div><h4>Random Forest + SHAP</h4><p>Balanced 200-tree ensemble with per-transaction Shapley value decomposition for complete explainability.</p></div>
+            <div class="step-arrow">→</div>
+            <div class="step-card"><div class="step-num">03</div><h4>Cost Optimization</h4><p>Merchant-calibrated thresholding balancing False Positive friction against False Negative return logistics costs.</p></div>
+            <div class="step-arrow">→</div>
+            <div class="step-card"><div class="step-num">04</div><h4>Razorpay Intervention</h4><p>Dynamic COD gating, instant UPI discount triggers, WhatsApp address validation, and live webhook notes injection.</p></div>
+        </div>
+    </section>
+
+    <!-- RAZORPAY OFFICIAL CHECKOUT MODAL (ZERO-ERROR INTERACTIVE MODAL) -->
+    <div class="rzp-modal-backdrop hidden" id="rzp-modal">
+        <div class="rzp-modal-dialog">
+            <div class="rzp-modal-header">
+                <div class="rzp-brand">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#3395ff"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <div>
+                        <div class="rzp-title">Razorpay Trusted Business</div>
+                        <div class="rzp-sub">ReturnGuard Store Demo</div>
+                    </div>
+                </div>
+                <button class="rzp-modal-close" id="rzp-modal-close">&times;</button>
+            </div>
+
+            <div class="rzp-modal-body">
+                <div class="rzp-amount-bar">
+                    <div>
+                        <span class="rzp-amt-label">Total Payable</span>
+                        <div class="rzp-amount-val" id="modal-amount">₹12,000</div>
+                    </div>
+                    <div class="rzp-risk-pill" id="modal-risk-pill">
+                        🛡️ AI Risk Passed
+                    </div>
+                </div>
+
+                <div class="rzp-discount-alert hidden" id="modal-discount-box">
+                    ⚡ <strong id="modal-discount-label">₹200 Instant UPI Discount</strong> applied by ReturnGuard Risk Rules!
+                </div>
+
+                <div class="rzp-methods-list">
+                    <label class="rzp-method-option active" id="opt-upi">
+                        <input type="radio" name="rzp-opt" checked>
+                        <div class="rzp-opt-info">
+                            <div class="rzp-opt-title">⚡ Razorpay UPI (Instant QR / Apps)</div>
+                            <div class="rzp-opt-desc">Google Pay, PhonePe, Paytm, BHIM</div>
+                        </div>
+                        <span class="rzp-opt-badge green">Fastrack</span>
+                    </label>
+
+                    <label class="rzp-method-option" id="opt-card">
+                        <input type="radio" name="rzp-opt">
+                        <div class="rzp-opt-info">
+                            <div class="rzp-opt-title">💳 Cards (Credit / Debit)</div>
+                            <div class="rzp-opt-desc">Visa, MasterCard, RuPay, Corporate</div>
+                        </div>
+                        <span class="rzp-opt-badge">Instant</span>
+                    </label>
+
+                    <label class="rzp-method-option" id="opt-netbanking">
+                        <input type="radio" name="rzp-opt">
+                        <div class="rzp-opt-info">
+                            <div class="rzp-opt-title">🏦 NetBanking</div>
+                            <div class="rzp-opt-desc">HDFC, ICICI, SBI, Axis &amp; 50+ banks</div>
+                        </div>
+                    </label>
+
+                    <label class="rzp-method-option" id="opt-cod">
+                        <input type="radio" name="rzp-opt">
+                        <div class="rzp-opt-info">
+                            <div class="rzp-opt-title">💵 Cash on Delivery</div>
+                            <div class="rzp-opt-desc" id="modal-cod-desc">Pay upon physical delivery</div>
+                        </div>
+                        <span class="rzp-opt-badge" id="modal-cod-badge">Available</span>
+                    </label>
+                </div>
+
+                <div class="rzp-pay-action">
+                    <button class="rzp-btn-pay" id="modal-pay-btn">
+                        <span>Pay</span> <span id="modal-pay-amt">₹12,000</span>
+                    </button>
+                </div>
+
+                <!-- ===== TRANSACTION PIPELINE TRACE OVERLAY ===== -->
+                <div class="rzp-pipeline-overlay hidden" id="modal-processing">
+                    <div class="rzp-pipeline-header">
+                        <div class="rzp-pipeline-icon" id="pipeline-icon">⏳</div>
+                        <div class="rzp-pipeline-title" id="pipeline-title">Processing Transaction</div>
+                        <div class="rzp-pipeline-sub" id="pipeline-sub">Authenticating with Razorpay gateway...</div>
+                    </div>
+
+                    <div class="rzp-pipeline-steps">
+                        <div class="rzp-step" id="step-1">
+                            <div class="rzp-step-indicator" id="step-1-icon">
+                                <div class="rzp-step-spinner"></div>
+                            </div>
+                            <div class="rzp-step-body">
+                                <div class="rzp-step-label">Order Submitted</div>
+                                <div class="rzp-step-detail" id="step-1-detail">Validating cart &amp; shipping address</div>
+                            </div>
+                            <div class="rzp-step-status" id="step-1-status"></div>
+                        </div>
+
+                        <div class="rzp-step-connector" id="conn-1"></div>
+
+                        <div class="rzp-step" id="step-2">
+                            <div class="rzp-step-indicator waiting" id="step-2-icon">
+                                <span class="rzp-step-num">2</span>
+                            </div>
+                            <div class="rzp-step-body">
+                                <div class="rzp-step-label">ReturnGuard AI Risk Check</div>
+                                <div class="rzp-step-detail" id="step-2-detail">Scoring 12 risk signals via ML model</div>
+                            </div>
+                            <div class="rzp-step-status" id="step-2-status"></div>
+                        </div>
+
+                        <div class="rzp-step-connector" id="conn-2"></div>
+
+                        <div class="rzp-step" id="step-3">
+                            <div class="rzp-step-indicator waiting" id="step-3-icon">
+                                <span class="rzp-step-num">3</span>
+                            </div>
+                            <div class="rzp-step-body">
+                                <div class="rzp-step-label">Payment Gateway Auth</div>
+                                <div class="rzp-step-detail" id="step-3-detail">Razorpay encrypting transaction</div>
+                            </div>
+                            <div class="rzp-step-status" id="step-3-status"></div>
+                        </div>
+
+                        <div class="rzp-step-connector" id="conn-3"></div>
+
+                        <div class="rzp-step" id="step-4">
+                            <div class="rzp-step-indicator waiting" id="step-4-icon">
+                                <span class="rzp-step-num">4</span>
+                            </div>
+                            <div class="rzp-step-body">
+                                <div class="rzp-step-label">Bank / UPI Confirmation</div>
+                                <div class="rzp-step-detail" id="step-4-detail">Awaiting issuer acknowledgement</div>
+                            </div>
+                            <div class="rzp-step-status" id="step-4-status"></div>
+                        </div>
+                    </div>
+
+                    <!-- Failure Reason Card (shown only on block) -->
+                    <div class="rzp-failure-card hidden" id="pipeline-failure-card">
+                        <div class="rzp-failure-title">🚫 Why was this blocked?</div>
+                        <ul class="rzp-failure-reasons" id="pipeline-failure-reasons"></ul>
+                        <button class="rzp-switch-upi-btn" id="pipeline-switch-upi">
+                            ⚡ Switch to UPI — Get <span id="pipeline-discount-label">₹200</span> Off
+                        </button>
+                    </div>
+
+                    <!-- Success Card -->
+                    <div class="rzp-success-card hidden" id="pipeline-success-card">
+                        <div class="rzp-success-checkmark">✓</div>
+                        <div class="rzp-success-title">Payment Successful!</div>
+                        <div class="rzp-success-id" id="pipeline-pay-id">pay_rzp_xxxxxxx</div>
+                        <div class="rzp-success-sub">ReturnGuard Verified · Risk Cleared</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rzp-modal-footer">
+                <span>🔒 Secured by 256-Bit Razorpay AI Risk Engine</span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>ReturnGuard</span>
+            </div>
+            <p>Razorpay AI Buildathon — Track 02: AI Risk Manager | Defense-Only Architecture</p>
+        </div>
+    </footer>
+
+    <!-- JARVIS AI CHATBOT -->
+    <div class="jarvis-chatbot" id="jarvis-chatbot">
+        <!-- Floating Tooltip -->
+        <div class="jarvis-tooltip" id="jarvis-tooltip">Ask your questions</div>
+        <!-- Floating Bubble -->
+        <button class="jarvis-bubble" id="jarvis-bubble" aria-label="Ask Jarvis AI">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+        </button>
+
+        <!-- Chat Window -->
+        <div class="jarvis-window hidden" id="jarvis-window">
+            <div class="jarvis-header">
+                <div class="jarvis-info">
+                    <span class="jarvis-title">Jarvis AI</span>
+                    <span class="jarvis-status">Online</span>
+                </div>
+                <button class="jarvis-close" id="jarvis-close" aria-label="Close Chat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="jarvis-messages" id="jarvis-messages">
+                <div class="msg bot">Hello, I am Jarvis, the ReturnGuard AI Assistant. I can help explain ReturnGuard's architecture, explain risk factors, set up webhooks, or troubleshoot any issues. Ask me anything!</div>
+            </div>
+            <form class="jarvis-input-area" id="jarvis-form">
+                <input type="text" class="jarvis-input" id="jarvis-input" placeholder="Ask Jarvis..." required autocomplete="off">
+                <button type="submit" class="jarvis-send-btn" aria-label="Send">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js?v=3"></script>
+</body>
+</html>
