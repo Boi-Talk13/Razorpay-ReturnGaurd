@@ -7,7 +7,7 @@
 
 ---
 
-## 📌 Executive Summary & The Problem
+##  Executive Summary & The Problem
 
 In Indian e-commerce, **Return to Origin (RTO)** and return fraud drain over **₹30,000 Crores annually**. 
 - **Cash on Delivery (COD)** orders suffer 3x to 4x higher return rates than prepaid orders.
@@ -18,7 +18,7 @@ In Indian e-commerce, **Return to Origin (RTO)** and return fraud drain over **�
 
 ---
 
-## ⚡ Key Capabilities
+##  Key Capabilities
 
 ```mermaid
 graph LR
@@ -108,7 +108,7 @@ Open **`http://localhost:8000`** in your browser.
 ---
 
 
-## 🔌 API Reference
+##  API Reference
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
@@ -131,5 +131,5 @@ Open **`http://localhost:8000`** in your browser.
 
 ---
 
-## 🛡️ Responsible AI & Defense-Only
+##  Responsible AI & Defense-Only
 ReturnGuard is designed strictly for **merchant defense and fraud mitigation**. It operates within ethical ML guidelines, providing transparent SHAP attribution without biased demographic profiling.
