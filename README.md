@@ -1,4 +1,4 @@
-#  ReturnGuard — AI Risk Manager for Razorpay
+# ReturnGuard — AI Risk Manager for Razorpay
 
 > **Razorpay AI Buildathon — Track 02: AI Risk Manager**  
 > *An intelligent return-risk scoring engine & dynamic checkout intervention system designed to eliminate RTO (Return to Origin) losses and return fraud for Indian merchants.*
@@ -7,7 +7,7 @@
 
 ---
 
-##  Executive Summary & The Problem
+## Executive Summary & The Problem
 
 In Indian e-commerce, **Return to Origin (RTO)** and return fraud drain over **₹30,000 Crores annually**. 
 - **Cash on Delivery (COD)** orders suffer 3x to 4x higher return rates than prepaid orders.
@@ -18,7 +18,7 @@ In Indian e-commerce, **Return to Origin (RTO)** and return fraud drain over **�
 
 ---
 
-##  Key Capabilities
+## Key Capabilities
 
 ```mermaid
 graph LR
@@ -32,33 +32,33 @@ graph LR
     H --> I[Persistent Decision Audit Log]
 ```
 
-### 1.  Precision ML Scoring & SHAP Explainability
+### 1. Precision ML Scoring & SHAP Explainability
 - Trained on **10,000 Indian e-commerce transactions** with realistic demographic, payment, and velocity distributions.
 - **SHAP (SHapley Additive exPlanations)** calculates exact feature attribution per transaction (e.g. *Tier-3 COD increases risk by +0.32*, *Loyal Customer reduces risk by -0.28*).
 - **Model Performance**: Achieves **~40% Precision**, **~39% Recall**, and **~0.79 AUC-ROC** on the synthetic test split, representing realistic RTO return behavior profiles.
 
-### 2.  Merchant Economics & Policy Simulator
+### 2. Merchant Economics & Policy Simulator
 - Balances **False Positive Cost** (blocked revenue) against **False Negative Cost** (RTO logistics loss).
 - Interactive **Threshold Tuner** lets merchants calibrate their risk posture in real-time (Strict vs Balanced vs Growth mode) with live monthly net savings projections.
 
-### 3.  Dynamic Razorpay Checkout Interventions
+### 3. Dynamic Razorpay Checkout Interventions
 - High-risk orders automatically **disable COD** and inject an **instant UPI discount offer** (e.g. ₹200 off) to convert risky COD orders into verified prepaid payments.
 - Supports both interactive **Mobile Simulator** and the official **Razorpay Standard Checkout Modal (`checkout.razorpay.com/v1/checkout.js`)**.
 
-### 4.  AI Risk Copilot & 1-Click WhatsApp Verification
+### 4. AI Risk Copilot & 1-Click WhatsApp Verification
 - Generates executive forensic risk briefs explaining anomalous behavior.
 - Provides a ready-to-dispatch **1-Click WhatsApp verification message** for delivery teams to confirm high-risk addresses before fulfillment.
 
-### 5.  Live Razorpay Webhooks Listener
+### 5. Live Razorpay Webhooks Listener
 - Production-ready `POST /api/webhook/razorpay` endpoint with **HMAC-SHA256 signature verification** (`X-Razorpay-Signature`) to intercept live payment events from the Razorpay Dashboard.
 
-### 6.  Batch Processing & Persistent Audit Trail
+### 6. Batch Processing & Persistent Audit Trail
 - Scores up to **10,000 orders** in batch mode with instant CSV export.
 - Maintains a persistent JSON-backed **Decision Audit Ledger** with 1-click CSV & JSON download for merchant compliance.
 
 ---
 
-##  System Architecture
+## System Architecture
 
 ```
 risk-scorer/
@@ -83,12 +83,23 @@ risk-scorer/
 
 ---
 
-##  Quick Start (Run Locally)
+## Build Challenges & Technical Obstacles
+
+During the development of ReturnGuard, we faced and overcame the following key technical challenges:
+
+* **Real-Time SHAP Execution Latency:** Calculating game-theoretic SHAP explanation values dynamically is mathematically intensive and typically delays checkout loading times. We optimized this by caching the pre-trained Random Forest model and scaler, limiting features to the top 5 most impactful vectors, and restricting computation depth to keep response times under 50ms.
+* **Webhook Verification & Spoofing Protection:** Intercepting payment events reliably requires robust signature verification. We implemented secure HMAC-SHA256 signature verification matching Razorpay's webhook design to protect the API endpoint from malicious payload injection.
+* **Zero-Dependency Chart Rendering:** Loading large graphing packages (like Chart.js or D3) increases initial page bundle sizes and delays page load. We built a custom SVG graph engine in pure vanilla JavaScript, programmatically drawing interactive Bezier curve paths directly as inline SVGs.
+* **ML Threshold Balancing vs Rule Constraints:** Balancing false-positive blocks against true RTO protection is tricky. We solved this by developing a dual-layered evaluation engine that couples Random Forest probability scores with post-ML safety overrides (e.g., safeguarding low-value COD purchases under ₹10,000 to minimize user friction).
+
+---
+
+## Quick Start (Run Locally)
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/your-username/returnguard-razorpay.git
-cd returnguard-razorpay
+git clone https://github.com/Boi-Talk13/Razorpay-ReturnGaurd.git
+cd Razorpay-ReturnGaurd
 pip install -r requirements.txt
 ```
 
