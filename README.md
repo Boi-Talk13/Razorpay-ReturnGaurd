@@ -1,11 +1,9 @@
-# 🛡️ ReturnGuard — AI Risk Manager for Razorpay
+#  ReturnGuard — AI Risk Manager for Razorpay
 
 > **Razorpay AI Buildathon — Track 02: AI Risk Manager**  
 > *An intelligent return-risk scoring engine & dynamic checkout intervention system designed to eliminate RTO (Return to Origin) losses and return fraud for Indian merchants.*
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live%20Online-6366f1?style=for-the-badge&logo=vercel)](https://your-deployment-url.onrender.com)
-[![Razorpay Buildathon](https://img.shields.io/badge/Razorpay-AI%20Buildathon%202026-0c2340?style=for-the-badge&logo=razorpay)](https://razorpay.com)
-[![License](https://img.shields.io/badge/License-MIT-34d399?style=for-the-badge)](LICENSE)
+
 
 ---
 
@@ -34,33 +32,33 @@ graph LR
     H --> I[Persistent Decision Audit Log]
 ```
 
-### 1. 🎯 Precision ML Scoring & SHAP Explainability
+### 1.  Precision ML Scoring & SHAP Explainability
 - Trained on **10,000 Indian e-commerce transactions** with realistic demographic, payment, and velocity distributions.
 - **SHAP (SHapley Additive exPlanations)** calculates exact feature attribution per transaction (e.g. *Tier-3 COD increases risk by +0.32*, *Loyal Customer reduces risk by -0.28*).
 - **Model Performance**: Achieves **~40% Precision**, **~39% Recall**, and **~0.79 AUC-ROC** on the synthetic test split, representing realistic RTO return behavior profiles.
 
-### 2. 💰 Merchant Economics & Policy Simulator
+### 2.  Merchant Economics & Policy Simulator
 - Balances **False Positive Cost** (blocked revenue) against **False Negative Cost** (RTO logistics loss).
 - Interactive **Threshold Tuner** lets merchants calibrate their risk posture in real-time (Strict vs Balanced vs Growth mode) with live monthly net savings projections.
 
-### 3. 🛒 Dynamic Razorpay Checkout Interventions
+### 3.  Dynamic Razorpay Checkout Interventions
 - High-risk orders automatically **disable COD** and inject an **instant UPI discount offer** (e.g. ₹200 off) to convert risky COD orders into verified prepaid payments.
 - Supports both interactive **Mobile Simulator** and the official **Razorpay Standard Checkout Modal (`checkout.razorpay.com/v1/checkout.js`)**.
 
-### 4. 🤖 AI Risk Copilot & 1-Click WhatsApp Verification
+### 4.  AI Risk Copilot & 1-Click WhatsApp Verification
 - Generates executive forensic risk briefs explaining anomalous behavior.
 - Provides a ready-to-dispatch **1-Click WhatsApp verification message** for delivery teams to confirm high-risk addresses before fulfillment.
 
-### 5. ⚡ Live Razorpay Webhooks Listener
+### 5.  Live Razorpay Webhooks Listener
 - Production-ready `POST /api/webhook/razorpay` endpoint with **HMAC-SHA256 signature verification** (`X-Razorpay-Signature`) to intercept live payment events from the Razorpay Dashboard.
 
-### 6. 📊 Batch Processing & Persistent Audit Trail
+### 6.  Batch Processing & Persistent Audit Trail
 - Scores up to **10,000 orders** in batch mode with instant CSV export.
 - Maintains a persistent JSON-backed **Decision Audit Ledger** with 1-click CSV & JSON download for merchant compliance.
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```
 risk-scorer/
@@ -85,7 +83,7 @@ risk-scorer/
 
 ---
 
-## 🚀 Quick Start (Run Locally)
+##  Quick Start (Run Locally)
 
 ### 1. Clone & Install Dependencies
 ```bash
@@ -109,25 +107,6 @@ Open **`http://localhost:8000`** in your browser.
 
 ---
 
-## ☁️ 1-Click Cloud Deployment (Online Submission)
-
-### Option A: Deploy on Render (Recommended — Free & 2 Mins)
-1. Push this repository to GitHub.
-2. Log in to [Render.com](https://render.com) and click **New + > Web Service**.
-3. Select your GitHub repository.
-4. Render will automatically read `render.yaml` or set:
-   - **Environment**: Python
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `cd backend && gunicorn app:app --bind 0.0.0.0:$PORT --workers 2`
-5. Click **Deploy**. Your app will be live at `https://<your-service>.onrender.com`.
-
-### Option B: Deploy on Railway / Fly.io
-Deploy directly using the included `Dockerfile`:
-```bash
-railway up
-```
-
----
 
 ## 🔌 API Reference
 
@@ -148,13 +127,7 @@ railway up
 
 ---
 
-## 🎥 2-Minute Demo Video Pitch Script (For Submission)
-
-- **[0:00 - 0:25] The Problem**: *"Indian merchants lose ₹30k Cr yearly to COD return fraud and RTOs. Current rules engines block good customers or let fraudsters slip through."*
-- **[0:25 - 0:50] The Solution (ReturnGuard)**: *"ReturnGuard connects directly to Razorpay. Using Random Forest and SHAP explainability, we evaluate return probability in milliseconds before order dispatch."*
-- **[0:50 - 1:20] Live Demo**: *Click preset 'High-Risk COD Electronics' → Show gauge turning Red → Point to SHAP factors → Show automated WhatsApp outreach template.*
-- **[1:20 - 1:45] Razorpay Dynamic Checkout**: *Show how high-risk orders disable COD and offer a ₹200 UPI discount to convert them to verified prepaid.*
-- **[1:45 - 2:00] ROI & Wrap Up**: *"In our Policy Simulator, an average merchant processing 10k orders/month saves over ₹1.2 Lakhs in net RTO costs. Thank you!"*
+*"!Thank you!"*
 
 ---
 
